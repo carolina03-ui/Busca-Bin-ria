@@ -40,16 +40,16 @@ void adicionar_livro_ordenado(Biblioteca* b, Livro livro) {
         while (atual != NULL && strcmp(atual->livro.titulo, livro.titulo) < 0) {
             atual = atual->next;
         }
-        if (atual == b->head) { 
+        if (atual == b->head) {
             novo->next = b->head;
             b->head->prev = novo;
             b->head = novo;
             novo->prev = NULL;
-        } else if (atual == NULL) { 
+        } else if (atual == NULL) {
             novo->prev = b->tail;
             b->tail->next = novo;
             b->tail = novo;
-        } else { 
+        } else {
             novo->prev = atual->prev;
             novo->next = atual;
             atual->prev->next = novo;
@@ -83,7 +83,7 @@ void remover_livro(Biblioteca* b, const char* titulo) {
         atual = atual->next;
     }
 
-    printf("Livro '%s' não encontrado na biblioteca.\n", titulo);
+    printf("Livro '%s' nao encontrado na biblioteca.\n", titulo);
 }
 
 int comparar_livros(const void* a, const void* b) {
@@ -109,7 +109,6 @@ Livro* copiar_para_array(Biblioteca* b, int* tamanho) {
     }
 
     Livro* livros_array = (Livro*)malloc((*tamanho) * sizeof(Livro));
-
     atual = b->head;
     for (int i = 0; i < *tamanho; i++) {
         livros_array[i] = atual->livro;
@@ -168,7 +167,6 @@ void buscar_livro(Biblioteca* b) {
             fgets(titulo, sizeof(titulo), stdin);
             titulo[strcspn(titulo, "\n")] = 0;
             livros_array = copiar_para_array(b, &tamanho);
-            busca_binaria(livros_array, tamanho, titulo, "", -1);
             break;
 
         case 2:
@@ -176,7 +174,6 @@ void buscar_livro(Biblioteca* b) {
             fgets(autor, sizeof(autor), stdin);
             autor[strcspn(autor, "\n")] = 0;
             livros_array = copiar_para_array(b, &tamanho);
-            busca_binaria(livros_array, tamanho, "", autor, -1);
             break;
 
         case 3:
@@ -184,7 +181,6 @@ void buscar_livro(Biblioteca* b) {
             scanf("%d", &ano);
             getchar();
             livros_array = copiar_para_array(b, &tamanho);
-            busca_binaria(livros_array, tamanho, "", "", ano);
             break;
 
         default:
@@ -198,12 +194,12 @@ void buscar_livro(Biblioteca* b) {
                                    strcmp(autor, "") == 0 ? "" : autor,
                                    ano == 0 ? -1 : ano);
         if (indice != -1) {
-            printf("Livro encontrado: Tatulo: %s, Autor: %s, Ano: %d\n",
+            printf("Livro encontrado: Titulo: %s, Autor: %s, Ano: %d\n",
                    livros_array[indice].titulo,
                    livros_array[indice].autor,
                    livros_array[indice].ano);
         } else {
-            printf("Livro não encontrado!\n");
+            printf("Livro nao encontrado!\n");
         }
         free(livros_array);
     }
@@ -220,6 +216,22 @@ void listar_livros(Biblioteca* b) {
         printf("Titulo: %s, Autor: %s, Ano: %d\n", atual->livro.titulo, atual->livro.autor, atual->livro.ano);
         atual = atual->next;
     }
+}
+
+void listar_livros_ordenados(Biblioteca* b) {
+    int tamanho = 0;
+    Livro* livros_array = copiar_para_array(b, &tamanho);
+
+    if (tamanho > 0) {
+        qsort(livros_array, tamanho, sizeof(Livro), comparar_livros);
+        printf("Livros na biblioteca em ordem alfabética:\n");
+        for (int i = 0; i < tamanho; i++) {
+            printf("Titulo: %s, Autor: %s, Ano: %d\n", livros_array[i].titulo, livros_array[i].autor, livros_array[i].ano);
+        }
+    } else {
+        printf("Nao ha livros na biblioteca.\n");
+    }
+    free(livros_array);
 }
 
 void liberar_biblioteca(Biblioteca* b) {
@@ -241,8 +253,9 @@ int main() {
         printf("1. Adicionar Livro\n");
         printf("2. Remover Livro\n");
         printf("3. Listar Livros\n");
-        printf("4. Buscar Livro\n");
-        printf("5. Sair\n");
+        printf("4. Listar Livros Ordenados\n");
+        printf("5. Buscar Livro\n");
+        printf("6. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
         getchar();
@@ -278,16 +291,20 @@ int main() {
                 listar_livros(minha_biblioteca);
                 break;
             case 4:
-                buscar_livro(minha_biblioteca);
+                listar_livros_ordenados(minha_biblioteca);
                 break;
             case 5:
+                buscar_livro(minha_biblioteca);
+                break;
+            case 6:
                 printf("Saindo do sistema...\n");
                 break;
             default:
                 printf("Opcao invalida! Tente novamente.\n");
         }
-    } while (opcao != 5);
+    } while (opcao != 6);
 
     liberar_biblioteca(minha_biblioteca);
     return 0;
 }
+
